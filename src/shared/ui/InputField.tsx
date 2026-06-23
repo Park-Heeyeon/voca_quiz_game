@@ -1,4 +1,4 @@
-import { Input } from "@/components/ui/input";
+import { Input } from "./primitives/input";
 import {
   FormControl,
   FormDescription,
@@ -6,7 +6,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
+} from "./primitives/form";
 import { Control, FieldValues, Path } from "react-hook-form";
 
 type FieldProps<T extends FieldValues> = {

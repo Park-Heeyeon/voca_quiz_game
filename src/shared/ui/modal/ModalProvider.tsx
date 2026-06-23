@@ -1,10 +1,9 @@
-import { modalState } from "@/atom/modalState";
-import { useRecoilValue } from "recoil";
+import { useModalStore } from "@/shared/store/modalStore";
+import useModal from "@/shared/lib/useModal";
 import ModalLayout from "./ModalLayout";
-import useModal from "@/utils/useModal";
 
 const ModalProvider: React.FC = () => {
-  const modals = useRecoilValue(modalState);
+  const modals = useModalStore((s) => s.modals);
   const { closeModal } = useModal();
 
   return (
@@ -19,7 +18,7 @@ const ModalProvider: React.FC = () => {
                 onClick={() => {
                   closeModal(modal.id);
                   if (modal.clickEvent) {
-                    modal.clickEvent(); // 클릭 이벤트가 있을 경우 호출
+                    modal.clickEvent();
                   }
                 }}
               />
