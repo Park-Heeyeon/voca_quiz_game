@@ -2,32 +2,66 @@
 
 이 프로젝트는 **React.js**와 **TypeScript**를 사용하여 개발된 언어 학습 애플리케이션입니다. 사용자에게 단어 학습과 레벨별 퀴즈 기능을 제공하여 효과적으로 학습 진도를 관리하고 맞춤형 퀴즈를 제공합니다.
 
+## 이 프로젝트에서 보여주려는 것
+
+프론트엔드 개발자로서 다음 세 가지에 집중했습니다.
+
+1. **클린 아키텍처 / 관심사 분리**: 피처 기반 폴더 구조와 React 무관 도메인 로직 분리
+2. **모던 스택 / UX 폴리시**: React Query, Zustand, framer-motion 기반의 매끄러운 상호작용
+3. **테스트 용이성**: 도메인 순수함수에 대한 단위 테스트(Vitest)
+
 ## 주요 기술 스택
 
-- **React.js** + **TypeScript**: 사용자 인터페이스와 데이터 흐름을 위한 프론트엔드 라이브러리 및 언어
-- **Vite**: 빠르고 효율적인 빌드 도구 및 개발 서버
-- **pnpm**: 빠른 패키지 관리 도구
+- **React 18** + **TypeScript** + **Vite**
+- **상태 관리**: Zustand (전역 사용자/모달 상태), TanStack Query (서버 상태)
+- **폼/검증**: React Hook Form + Zod
+- **스타일링**: Tailwind CSS + class-variance-authority (디자인 시스템)
+- **모킹 백엔드**: MSW (인메모리 사용자 저장소로 인증 자격검증까지 처리)
+- **애니메이션**: framer-motion, react-canvas-confetti
+- **테스트**: Vitest
+- **패키지 매니저**: pnpm
 
-## 핵심 기능
+## 아키텍처
 
-- **회원가입, 로그인, 로그아웃**: `react-hook-form`과 `zod`를 이용한 유효성 검사 및 폼 관리
-- **단어 학습 및 퀴즈 기능**: 사용자가 단어 카드를 통해 학습하고, 레벨에 맞는 퀴즈를 통해 학습 진도를 점검할 수 있는 기능
-- **맞춤형 퀴즈 제공**: 사용자의 학습 진도에 따라 적합한 퀴즈를 제공하여 학습 효율성을 증대
-- **공통 모달 관리**: `recoil`을 통해 로그인 및 기타 UI 상호작용을 위한 공통 모달 상태를 관리
-- **페이지 분기 처리**: `react-router`를 사용하여 사용자 인터페이스의 페이지 전환 관리
+타입 기반 폴더 구조를 **피처 기반(feature-based)** 으로 재편하고, 도메인 로직을 UI에서 분리했습니다.
 
-## 사용 라이브러리 및 도구
-- **MSW (Mock Service Worker)**: 개발 환경에서 API 요청을 모킹하여 독립적인 프론트엔드 개발 가능
-- **Recoil**: 전역 상태 관리 라이브러리 (회원 정보, 회원 리스트, 로그인 여부, 공통 모달 관리)
-- **React-Query**: 서버 상태 관리 라이브러리
-- **React Router**: 페이지 분기 처리를 위한 라우팅 라이브러리
-- **TailwindCSS**, **scadcn/ui**: 스타일링 및 컴포넌트 기반 UI 구현
-- **Zod**: TypeScript 기반의 스키마 선언 및 유효성 검사 라이브러리
-- **React Hook Form**: 쉽고 효율적인 폼 관리를 위한 React 훅
+```
+src/
+  app/                  # App, 라우팅, 프로바이더
+  features/
+    auth/               # 로그인·회원가입·로그아웃 (api/hooks/components/schemas)
+    home/               # 방문자/사용자 홈
+    quiz/               # 퀴즈 (useQuiz 훅, generateQuiz·level 도메인)
+  shared/
+    ui/                 # 디자인 시스템 (Button, Card, ProgressBar, LevelBadge, Confetti...)
+    store/              # Zustand 스토어 (userStore, modalStore)
+    api/                # axios 클라이언트 + 공유 타입
+    lib/                # 유틸 (cn, useModal)
+  mocks/                # MSW 인메모리 mock 백엔드
+  pages/                # 페이지 조합
+```
 
-## 도전 과제
+### 핵심 설계 포인트
 
-사용자의 학습 진도와 성과를 기반으로 **맞춤형 퀴즈를 제공**하며, 학습 데이터를 효과적으로 관리하여 학습 효율성을 높이는 방식에 집중하였습니다. 이를 통해 사용자에게 보다 효율적인 학습 경험을 제공합니다.
+- **도메인 로직 중앙화**: 레벨/진행률 판정(`features/quiz/lib/level.ts`)과 퀴즈 생성(`features/quiz/lib/generateQuiz.ts`)을 React 무관 순수함수로 분리. 매직넘버는 `LEVEL_CONFIG` 단일 출처로 통합.
+- **인증 로직의 책임 이동**: 자격 검증을 컴포넌트에서 MSW 인메모리 백엔드로 옮겨, 클라이언트는 React Query mutation만 호출.
+- **주입 가능한 rng**: `generateQuiz`는 난수 생성기를 주입받아 셔플 동작을 결정적으로 테스트.
+
+## 실행 및 테스트
+
+```bash
+pnpm install
+pnpm dev        # 개발 서버 (MSW mock 백엔드 자동 활성)
+pnpm test       # 단위 테스트 (Vitest)
+pnpm build      # 타입체크 + 프로덕션 빌드
+pnpm lint       # ESLint
+```
+
+단위 테스트는 도메인 순수함수와 스토어를 대상으로 합니다.
+
+- `level.test.ts`: 진행률 증가, 레벨업 경계(90% → 레벨업), 최대 레벨 처리
+- `generateQuiz.test.ts`: 보기 3개·정답 포함·중복 제거·결정성·엣지 케이스
+- `userStore.test.ts`: 로그인/로그아웃/진행률 갱신
 
 ## 주요 페이지
 ### 진입화면 
