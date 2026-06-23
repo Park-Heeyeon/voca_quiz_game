@@ -94,8 +94,9 @@ src/
 
 - MSW를 인메모리 mock 백엔드로 확장: `users` 배열을 mock 내부에서 유지.
   - `POST /signup`: 닉네임·아이디 중복 검사 후 사용자 추가, 실패 시 4xx.
-  - `POST /login`: 자격 검증 후 사용자 정보 반환, 실패 시 401.
+  - `POST /login`: 자격 검증 후 `{ token, user }` 반환(토큰 + 유저 객체), 실패 시 401.
   - `POST /logout`: 세션 종료 응답.
+- 토큰 처리: 로그인 응답의 `token`을 `userStore`에 보관하고 `localStorage`에 영속화(새로고침 유지). axios 요청 인터셉터로 `Authorization` 헤더 부착. 로그아웃 시 토큰 제거.
 - 클라이언트는 React Query mutation만 호출. 컴포넌트에서 `userList` 직접 조회 제거.
 - 전역 `userListState`는 제거(또는 mock 내부로 흡수).
 
@@ -114,7 +115,7 @@ src/
 
 ### 6. 디자인 시스템 + 비주얼 전면 개편 (플레이풀 게임형)
 
-- `tailwind.config.ts` 토큰 재정의: 산발적 `customBlueColor` 계열 → 일관된 게임형 팔레트(주색/보조/성공/위험/중립 스케일).
+- `tailwind.config.ts` 토큰 재정의: 산발적 `customBlueColor` 계열 → 일관된 게임형 팔레트. 메인 컬러는 듀올링고식 그린 계열을 기본값으로 잡고(주색/보조/성공/위험/중립 스케일), 추후 교체 가능하게 토큰화.
 - `shared/ui/Button.tsx`: 커스텀+shadcn 중복 제거, CVA 변형. 듀올링고식 하단 그림자 3D 버튼(primary/secondary/ghost, size).
 - 추가 컴포넌트: `ProgressBar`, `LevelBadge`, `StreakCounter`(또는 XP 비주얼), `Card`.
 - 미사용 의존성 활용:
@@ -127,6 +128,7 @@ src/
 
 - 빈 `ProfileBox.tsx` 제거.
 - `main.tsx`의 mocking 가드 정리(개발/배포 분기 명확화).
+- 단어 데이터 확충: `mockData.json`의 레벨 1~3 단어를 더 풍부하게 늘림(레벨당 충분한 보기 풀과 학습 분량 확보). 보기 3개를 안정적으로 뽑을 수 있도록 레벨당 최소 단어 수 보장.
 - README를 새 구조/스크린샷 기준으로 갱신.
 
 ### 8. 단위 테스트
