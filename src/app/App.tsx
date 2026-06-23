@@ -1,10 +1,11 @@
-import { Route, Routes, Navigate } from "react-router-dom";
-import { HomePage, QuizPage, SignUpPage } from "./pages";
-import { useRecoilValue } from "recoil";
-import { isLoggedInState } from "./atom/isLoggedInState";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { useUserStore } from "@/shared/store/userStore";
+import HomePage from "@/pages/HomePage";
+import SignUpPage from "@/pages/SignUpPage";
+import { QuizPage } from "@/features/quiz";
 
 const App: React.FC = () => {
-  const isLoggedIn = useRecoilValue(isLoggedInState);
+  const isLoggedIn = useUserStore((s) => s.isLoggedIn);
 
   return (
     <Routes>
