@@ -22,7 +22,12 @@ export const useModalStore = create<ModalState>((set) => ({
   open: (modal) =>
     set((state) => {
       document.body.style.overflow = "hidden";
-      return { modals: [...state.modals, { ...modal, id: uuidv4() }] };
+      const newModal: ModalItem = {
+        type: "confirm",
+        ...modal,
+        id: uuidv4(),
+      };
+      return { modals: [...state.modals, newModal] };
     }),
   close: (id) =>
     set((state) => {

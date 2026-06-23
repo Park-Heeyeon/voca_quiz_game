@@ -1,6 +1,14 @@
 import type { User } from "@/shared/api/types";
 
-const users: User[] = [];
+const users: User[] = [
+  {
+    nickname: "테스터",
+    id: "test1234",
+    password: "Test1234!",
+    level: 1,
+    levelRate: 0,
+  },
+];
 
 export const findUserByCredentials = (
   id: string,
