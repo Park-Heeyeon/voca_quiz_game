@@ -1,6 +1,6 @@
 import useModal from "@/shared/lib/useModal";
 import { getRemainingRate } from "../lib/level";
-import { Confetti } from "@/shared/ui";
+import { Button, Confetti } from "@/shared/ui";
 
 interface AnswerModalProps {
   isAnswer: boolean;
@@ -25,22 +25,34 @@ const AnswerModal: React.FC<AnswerModalProps> = ({
   };
 
   return (
-    <div>
+    <div className="text-center">
       {isAnswer && <Confetti fire />}
-      <h2 className="text-xl font-semibold text-center mb-2">
-        {isAnswer ? "정답이에요 🥳🎉" : "오답이에요 😢💧"}
+      <div
+        className={`mx-auto grid place-items-center w-16 h-16 rounded-full text-3xl ${
+          isAnswer ? "bg-mint/15" : "bg-danger/15"
+        }`}
+      >
+        {isAnswer ? "🎉" : "💧"}
+      </div>
+      <h2
+        className={`mt-4 font-display font-bold text-2xl ${
+          isAnswer ? "text-mint" : "text-danger"
+        }`}
+      >
+        {isAnswer ? "정답이에요!" : "아쉬워요"}
       </h2>
+
       {isAnswer ? (
-        <p className="text-gray-700 text-center mb-4">
+        <p className="mt-2 text-ink-soft">
           {isLevelUp ? (
             <>
-              <span className="font-bold text-primary-dark">Level {level}</span>
-              로 업그레이드 되었어요!
+              <span className="font-bold text-brand">Level {level}</span> 로
+              올라갔어요!
             </>
           ) : (
             <>
               다음 레벨까지{" "}
-              <span className="font-bold text-primary-dark">
+              <span className="font-bold text-coral">
                 {getRemainingRate(levelRate)}%
               </span>{" "}
               남았어요.
@@ -48,16 +60,17 @@ const AnswerModal: React.FC<AnswerModalProps> = ({
           )}
         </p>
       ) : (
-        <p className="text-gray-700 text-center mb-4">
-          정답을 다시 생각해보세요!
-        </p>
+        <p className="mt-2 text-ink-soft">정답을 다시 생각해볼까요?</p>
       )}
-      <button
-        className="w-full py-2 px-4 bg-primary text-white font-bold rounded-lg transition duration-300"
+
+      <Button
+        variant={isAnswer ? "mint" : "coral"}
+        size="lg"
+        className="w-full mt-6"
         onClick={onClickBtn}
       >
         {isAnswer ? "다음 문제 풀기" : "다시 풀어보기"}
-      </button>
+      </Button>
     </div>
   );
 };

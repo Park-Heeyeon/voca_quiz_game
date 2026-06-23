@@ -21,23 +21,32 @@ const ModalLayout: React.FC<ModalItem> = ({
   };
 
   return (
-    <div className="w-full bg-gray-50 border-gray-300 flex flex-col text-center p-8 rounded-2xl shadow-md gap-4 mx-auto">
-      {type === "login" && (
-        <FaTimes
-          className="cursor-pointer text-muted self-end"
-          onClick={() => closeModal(id)}
-        />
+    <div className="w-full bg-white border border-line rounded-card shadow-card p-7 flex flex-col gap-4 animate-pop-in">
+      {(title || type === "login") && (
+        <div className="flex items-center justify-between">
+          <h1 className="font-display font-bold text-xl text-ink">
+            {title}
+          </h1>
+          {type === "login" && (
+            <button
+              aria-label="닫기"
+              className="grid place-items-center w-8 h-8 rounded-full text-ink-soft hover:bg-cloud transition"
+              onClick={() => closeModal(id)}
+            >
+              <FaTimes />
+            </button>
+          )}
+        </div>
       )}
-      {title && (
-        <h1 className="font-bold text-xl text-customDepGrayColor">{title}</h1>
-      )}
+
       {typeof content === "string" ? (
-        <p>{content}</p>
+        <p className="text-center text-ink-soft leading-relaxed">{content}</p>
       ) : (
         React.cloneElement(content, { clickEvent })
       )}
+
       {type === "confirm" && (
-        <Button className="mx-auto" onClick={onClickConfirm}>
+        <Button className="w-full" onClick={onClickConfirm}>
           확인
         </Button>
       )}

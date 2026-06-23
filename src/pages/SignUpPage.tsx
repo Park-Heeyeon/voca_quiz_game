@@ -1,35 +1,29 @@
 import { AiOutlineLeft } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import { SignUpForm } from "@/features/auth";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/shared/ui/primitives/card";
+import { Card, Logo } from "@/shared/ui";
 
 const SignUpPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
-
   return (
-    <div className="absolute inset-0 flex items-center justify-center">
-      <Card className="w-full max-w-xs sm:max-w-sm md:max-w-md p-5 pb-8">
-        <AiOutlineLeft
-          onClick={handleGoBack}
-          className="text-2xl cursor-pointer text-customDepGrayColor"
-        />
-        <CardHeader className="p-0 pt-4">
-          <CardTitle className="text-base sm:text-lg md:text-xl lg:text-2xl text-center flex-grow text-customDepGrayColor">
-            회원가입
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <SignUpForm />
-        </CardContent>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10">
+      <Logo className="mb-6" />
+      <Card className="w-full max-w-sm">
+        <div className="flex items-center gap-3 mb-5">
+          <button
+            aria-label="뒤로가기"
+            onClick={() => navigate(-1)}
+            className="grid place-items-center w-9 h-9 rounded-full bg-cloud text-ink-soft hover:text-ink transition"
+          >
+            <AiOutlineLeft className="w-4 h-4" />
+          </button>
+          <div>
+            <h1 className="font-display font-bold text-xl text-ink">회원가입</h1>
+            <p className="text-sm text-ink-soft">단어 모으기를 시작해볼까요?</p>
+          </div>
+        </div>
+        <SignUpForm />
       </Card>
     </div>
   );
