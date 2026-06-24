@@ -39,7 +39,7 @@ const load = (): ServerUser[] => {
   return createSeed();
 };
 
-let users: ServerUser[] = load();
+const users: ServerUser[] = load();
 
 export const persist = (): void => {
   try {
