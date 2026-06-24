@@ -4,11 +4,12 @@
 
 ## 이 프로젝트에서 보여주려는 것
 
-프론트엔드 개발자로서 다음 세 가지에 집중했습니다.
+프론트엔드 개발자로서 다음에 집중했습니다.
 
 1. **클린 아키텍처 / 관심사 분리**: 피처 기반 폴더 구조와 React 무관 도메인 로직 분리
 2. **모던 스택 / UX 폴리시**: React Query, Zustand, framer-motion 기반의 매끄러운 상호작용
 3. **테스트 용이성**: 도메인 순수함수에 대한 단위 테스트(Vitest)
+4. **학습 경험 설계**: 오답노트·복습 모드, 연속 학습(스트릭)·일일 목표, 새로고침에도 유지되는 학습 데이터 영속화
 
 ## 주요 기술 스택
 
@@ -32,12 +33,13 @@ src/
     auth/               # 로그인·회원가입·로그아웃 (api/hooks/components/schemas)
     home/               # 방문자/사용자 홈
     quiz/               # 퀴즈 (useQuiz 훅, generateQuiz·level 도메인)
+    review/             # 오답노트 기반 복습 (useReview·useWrongAnswers, ReviewPage)
   shared/
     ui/                 # 디자인 시스템 (Button, Card, ProgressBar, LevelBadge, Confetti...)
     store/              # Zustand 스토어 (userStore, modalStore)
-    api/                # axios 클라이언트 + 공유 타입
-    lib/                # 유틸 (cn, useModal)
-  mocks/                # MSW 인메모리 mock 백엔드
+    api/                # axios 클라이언트(토큰 인터셉터) + 공유 타입
+    lib/                # 유틸 (cn, useModal) + study(스트릭·일일목표 도메인)
+  mocks/                # MSW 인메모리 mock 백엔드 (localStorage 영속화)
   pages/                # 페이지 조합
 ```
 
@@ -46,6 +48,8 @@ src/
 - **도메인 로직 중앙화**: 레벨/진행률 판정(`features/quiz/lib/level.ts`)과 퀴즈 생성(`features/quiz/lib/generateQuiz.ts`)을 React 무관 순수함수로 분리. 매직넘버는 `LEVEL_CONFIG` 단일 출처로 통합.
 - **인증 로직의 책임 이동**: 자격 검증을 컴포넌트에서 MSW 인메모리 백엔드로 옮겨, 클라이언트는 React Query mutation만 호출.
 - **주입 가능한 rng**: `generateQuiz`는 난수 생성기를 주입받아 셔플 동작을 결정적으로 테스트.
+- **토큰 기반 세션 + 영속화**: 로그인 시 mock 백엔드가 토큰을 발급하고 axios 인터셉터가 자동 첨부. 학습 데이터(진행률·오답·스트릭·일일목표)는 `localStorage`에 저장되며, 새로고침 시 `/me`로 세션을 복원(부팅 스플래시).
+- **학습 도메인 분리**: 스트릭/일일목표 판정은 `shared/lib/study.ts` 순수함수로 분리해 단위 테스트. 복습 정답은 레벨 진행에 영향을 주지 않고 스트릭만 갱신하도록 규칙을 명확히 분리.
 
 ## 실행 및 테스트
 
@@ -68,7 +72,8 @@ pnpm lint       # ESLint
 
 - `level.test.ts`: 진행률 증가, 레벨업 경계(90% → 레벨업), 최대 레벨 처리
 - `generateQuiz.test.ts`: 보기 3개·정답 포함·중복 제거·결정성·엣지 케이스
-- `userStore.test.ts`: 로그인/로그아웃/진행률 갱신
+- `study.test.ts`: 날짜 키 변환, 연속 학습(스트릭) 증가·리셋, 일일 목표 카운트·경계값
+- `userStore.test.ts`: 로그인/로그아웃, 부팅 상태 토글
 
 ## 주요 페이지
 ### 진입화면 
