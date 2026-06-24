@@ -1,48 +1,20 @@
 import { create } from "zustand";
-import { createJSONStorage, persist, type StateStorage } from "zustand/middleware";
-import type { AuthSession, PublicUser } from "@/shared/api/types";
+import type { SessionUser } from "@/shared/api/types";
 
 type UserState = {
-  userInfo: PublicUser | null;
-  token: string | null;
+  userInfo: SessionUser | null;
   isLoggedIn: boolean;
-  login: (session: AuthSession) => void;
+  isBootstrapping: boolean;
+  setUser: (user: SessionUser) => void;
   logout: () => void;
-  updateProgress: (level: number, levelRate: number) => void;
+  setBootstrapping: (value: boolean) => void;
 };
 
-const noopStorage: StateStorage = {
-  getItem: () => null,
-  setItem: () => {},
-  removeItem: () => {},
-};
-
-export const useUserStore = create<UserState>()(
-  persist(
-    (set) => ({
-      userInfo: null,
-      token: null,
-      isLoggedIn: false,
-      login: ({ token, user }) =>
-        set({ token, userInfo: user, isLoggedIn: true }),
-      logout: () => set({ token: null, userInfo: null, isLoggedIn: false }),
-      updateProgress: (level, levelRate) =>
-        set((state) =>
-          state.userInfo
-            ? { userInfo: { ...state.userInfo, level, levelRate } }
-            : state
-        ),
-    }),
-    {
-      name: "voca-auth",
-      storage: createJSONStorage(() =>
-        typeof window !== "undefined" ? window.localStorage : noopStorage
-      ),
-      partialize: (state) => ({
-        userInfo: state.userInfo,
-        token: state.token,
-        isLoggedIn: state.isLoggedIn,
-      }),
-    }
-  )
-);
+export const useUserStore = create<UserState>((set) => ({
+  userInfo: null,
+  isLoggedIn: false,
+  isBootstrapping: true,
+  setUser: (user) => set({ userInfo: user, isLoggedIn: true }),
+  logout: () => set({ userInfo: null, isLoggedIn: false }),
+  setBootstrapping: (value) => set({ isBootstrapping: value }),
+}));
