@@ -1,6 +1,7 @@
 import { useModalStore } from "@/shared/store/modalStore";
 import useModal from "@/shared/lib/useModal";
 import ModalLayout from "./ModalLayout";
+import { isOverlayTarget } from "./overlayTarget";
 
 const ModalProvider: React.FC = () => {
   const modals = useModalStore((s) => s.modals);
@@ -9,10 +10,10 @@ const ModalProvider: React.FC = () => {
   return (
     <>
       {modals.map((modal, idx) => {
-        const isBottomModal = idx === 0;
+        const isTopModal = isOverlayTarget(idx, modals.length);
         return (
           <div key={modal.id} className="modal-wrapper">
-            {isBottomModal && (
+            {isTopModal && (
               <div
                 className="modal-overlay"
                 onClick={() => {
