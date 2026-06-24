@@ -7,6 +7,7 @@ interface AnswerModalProps {
   isLevelUp?: boolean;
   level?: number;
   levelRate?: number;
+  dailyGoalReached?: boolean;
   clickEvent?: () => void;
 }
 
@@ -15,6 +16,7 @@ const AnswerModal: React.FC<AnswerModalProps> = ({
   isLevelUp = false,
   level = 1,
   levelRate = 0,
+  dailyGoalReached = false,
   clickEvent,
 }) => {
   const { closeAllModal } = useModal();
@@ -61,6 +63,12 @@ const AnswerModal: React.FC<AnswerModalProps> = ({
         </p>
       ) : (
         <p className="mt-2 text-ink-soft">정답을 다시 생각해볼까요?</p>
+      )}
+
+      {isAnswer && dailyGoalReached && (
+        <div className="mt-3 rounded-2xl bg-amber/20 text-ink font-semibold py-2 px-3 text-sm">
+          🔥 오늘의 목표를 달성했어요!
+        </div>
       )}
 
       <Button
