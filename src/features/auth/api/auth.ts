@@ -1,10 +1,10 @@
 import { api } from "@/shared/api/client";
 import type {
   ApiResponse,
+  AuthSession,
   LoginInput,
   PublicUser,
   SignUpInput,
-  User,
 } from "@/shared/api/types";
 
 export const requestSignUp = async (
@@ -14,8 +14,10 @@ export const requestSignUp = async (
   return data.data;
 };
 
-export const requestLogin = async (input: LoginInput): Promise<User> => {
-  const { data } = await api.post<ApiResponse<User>>("/login", input);
+export const requestLogin = async (
+  input: LoginInput
+): Promise<AuthSession> => {
+  const { data } = await api.post<ApiResponse<AuthSession>>("/login", input);
   return data.data;
 };
 

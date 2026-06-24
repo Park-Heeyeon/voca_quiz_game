@@ -1,4 +1,4 @@
-import type { User } from "@/shared/api/types";
+import type { PublicUser, User } from "@/shared/api/types";
 
 const users: User[] = [
   {
@@ -26,3 +26,13 @@ export const addUser = (user: User): User => {
   users.push(user);
   return user;
 };
+
+export const toPublicUser = (user: User): PublicUser => ({
+  nickname: user.nickname,
+  id: user.id,
+  level: user.level,
+  levelRate: user.levelRate,
+});
+
+export const issueToken = (user: User): string =>
+  `mock.${btoa(encodeURIComponent(user.id))}.${Date.now()}`;

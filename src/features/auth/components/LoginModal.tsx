@@ -26,8 +26,8 @@ const LoginModal: React.FC = () => {
     loginMutation.mutate(
       { id, password },
       {
-        onSuccess: (user) => {
-          login(user);
+        onSuccess: (session) => {
+          login(session);
           closeAllModal();
           navigate("/");
         },

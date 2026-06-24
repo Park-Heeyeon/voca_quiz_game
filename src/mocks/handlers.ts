@@ -5,10 +5,12 @@ import {
   findUserByCredentials,
   isIdTaken,
   isNicknameTaken,
+  issueToken,
+  toPublicUser,
 } from "./db";
 import type {
+  AuthSession,
   LoginInput,
-  PublicUser,
   SignUpInput,
   Word,
 } from "@/shared/api/types";
@@ -33,13 +35,7 @@ const signUpHandler = http.post("/api/signup", async ({ request }) => {
   }
 
   const user = addUser({ nickname, id, password, level: 1, levelRate: 0 });
-  const publicUser: PublicUser = {
-    nickname: user.nickname,
-    id: user.id,
-    level: user.level,
-    levelRate: user.levelRate,
-  };
-  return ok(publicUser);
+  return ok(toPublicUser(user));
 });
 
 const loginHandler = http.post("/api/login", async ({ request }) => {
@@ -55,7 +51,12 @@ const loginHandler = http.post("/api/login", async ({ request }) => {
       { status: 401 }
     );
   }
-  return ok(user);
+
+  const session: AuthSession = {
+    token: issueToken(user),
+    user: toPublicUser(user),
+  };
+  return ok(session);
 });
 
 const logoutHandler = http.post("/api/logout", () => ok(null));

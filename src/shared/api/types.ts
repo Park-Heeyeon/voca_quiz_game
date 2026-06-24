@@ -13,6 +13,11 @@ export type User = {
 
 export type PublicUser = Omit<User, "password">;
 
+export type AuthSession = {
+  token: string;
+  user: PublicUser;
+};
+
 export type ApiResponse<T> = {
   code: string;
   status: number;
