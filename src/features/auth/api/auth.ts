@@ -1,26 +1,31 @@
 import { api } from "@/shared/api/client";
 import type {
   ApiResponse,
-  AuthSession,
   LoginInput,
-  PublicUser,
+  LoginResponse,
+  SessionUser,
   SignUpInput,
 } from "@/shared/api/types";
 
 export const requestSignUp = async (
   input: SignUpInput
-): Promise<PublicUser> => {
-  const { data } = await api.post<ApiResponse<PublicUser>>("/signup", input);
+): Promise<SessionUser> => {
+  const { data } = await api.post<ApiResponse<SessionUser>>("/signup", input);
   return data.data;
 };
 
 export const requestLogin = async (
   input: LoginInput
-): Promise<AuthSession> => {
-  const { data } = await api.post<ApiResponse<AuthSession>>("/login", input);
+): Promise<LoginResponse> => {
+  const { data } = await api.post<ApiResponse<LoginResponse>>("/login", input);
   return data.data;
 };
 
 export const requestLogout = async (): Promise<void> => {
   await api.post("/logout");
+};
+
+export const requestMe = async (): Promise<SessionUser> => {
+  const { data } = await api.get<ApiResponse<SessionUser>>("/me");
+  return data.data;
 };

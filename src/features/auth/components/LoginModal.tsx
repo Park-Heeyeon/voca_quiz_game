@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { Form } from "@/shared/ui/primitives/form";
 import { Button, InputField } from "@/shared/ui";
 import useModal from "@/shared/lib/useModal";
+import { setStoredToken } from "@/shared/api/client";
 import { useUserStore } from "@/shared/store/userStore";
 import type { LoginInput } from "@/shared/api/types";
 import { useAuth } from "../hooks/useAuth";
@@ -10,7 +11,7 @@ import { useAuth } from "../hooks/useAuth";
 const LoginModal: React.FC = () => {
   const { openModal, closeAllModal } = useModal();
   const navigate = useNavigate();
-  const login = useUserStore((s) => s.login);
+  const setUser = useUserStore((s) => s.setUser);
   const { loginMutation } = useAuth();
 
   const form = useForm<LoginInput>({
@@ -26,8 +27,9 @@ const LoginModal: React.FC = () => {
     loginMutation.mutate(
       { id, password },
       {
-        onSuccess: (session) => {
-          login(session);
+        onSuccess: (res) => {
+          setStoredToken(res.token);
+          setUser(res.user);
           closeAllModal();
           navigate("/");
         },
