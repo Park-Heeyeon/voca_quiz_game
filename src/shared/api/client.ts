@@ -6,7 +6,8 @@ import axios, {
 import { useAuthStore } from "@/shared/model/authStore";
 import { ApiResponseType, RefreshResponseType } from "./types";
 
-const BASE_URL = import.meta.env.VITE_REACT_API_URL;
+// MSW가 같은 origin의 /api를 가로채므로 기본값을 둔다. env가 없어도 동작한다.
+const BASE_URL = import.meta.env.VITE_REACT_API_URL ?? "/api";
 
 // withCredentials를 켜야 refreshToken 쿠키가 함께 전송된다.
 const api = axios.create({ baseURL: BASE_URL, withCredentials: true });

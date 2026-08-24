@@ -1,6 +1,5 @@
 export { default as Button } from "./Button";
 export { default as Card } from "./Card";
-export { default as Confetti } from "./Confetti";
 export { default as InputField } from "./InputField";
 export { default as LevelBadge } from "./LevelBadge";
 export { default as Logo } from "./Logo";

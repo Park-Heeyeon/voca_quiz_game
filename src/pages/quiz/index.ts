@@ -1,1 +1,1 @@
-export { default as QuizPage } from "./ui/QuizPage";
+export { default } from "./ui/QuizPage";
