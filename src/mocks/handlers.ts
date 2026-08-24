@@ -3,26 +3,42 @@ import mockData from "./mockData.json";
 import {
   addUser,
   advance,
-  clearToken,
+  clearSession,
+  findByAccessToken,
   findById,
   findByNickname,
-  findByToken,
-  issueToken,
+  findByRefreshToken,
+  issueSession,
+  REFRESH_TOKEN_TTL,
+  rotateAccessToken,
   toProfile,
 } from "./db";
 
-const ok = <T>(data?: T) =>
-  HttpResponse.json({ code: "OK", status: 200, data });
+const REFRESH_COOKIE = "refreshToken";
+
+const ok = <T>(data?: T, headers?: HeadersInit) =>
+  HttpResponse.json({ code: "OK", status: 200, data }, { headers });
 
 const fail = (code: string, message: string, status: number) =>
   HttpResponse.json({ code, message }, { status });
 
 const unauthorized = () => fail("UNAUTHORIZED", "인증이 필요합니다.", 401);
 
+// JS가 읽지 못하도록 HttpOnly로 내려준다.
+const setRefreshCookie = (token: string) => ({
+  "Set-Cookie": `${REFRESH_COOKIE}=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${
+    REFRESH_TOKEN_TTL / 1000
+  }`,
+});
+
+const expireRefreshCookie = () => ({
+  "Set-Cookie": `${REFRESH_COOKIE}=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0`,
+});
+
 const authUser = (request: Request) => {
   const auth = request.headers.get("Authorization");
   if (!auth?.startsWith("Bearer ")) return undefined;
-  return findByToken(auth.slice(7));
+  return findByAccessToken(auth.slice(7));
 };
 
 const signUpHandler = http.post("/api/signup", async ({ request }) => {
@@ -64,14 +80,29 @@ const loginHandler = http.post("/api/login", async ({ request }) => {
     );
   }
 
-  return ok({ user: toProfile(user), token: issueToken(user) });
+  const session = issueSession(user);
+  return ok(
+    { user: toProfile(user), accessToken: session.accessToken },
+    setRefreshCookie(session.refreshToken)
+  );
+});
+
+// accessToken이 만료되면 쿠키의 refreshToken으로 새 accessToken을 받는다.
+const refreshHandler = http.post("/api/refresh", ({ cookies }) => {
+  const refreshToken = cookies[REFRESH_COOKIE];
+  if (!refreshToken) return unauthorized();
+
+  const user = findByRefreshToken(refreshToken);
+  if (!user) return fail("REFRESH_EXPIRED", "다시 로그인해주세요.", 401);
+
+  return ok({ accessToken: rotateAccessToken(user) });
 });
 
 const logoutHandler = http.post("/api/logout", ({ request }) => {
   const user = authUser(request);
-  if (user) clearToken(user);
+  if (user) clearSession(user);
 
-  return ok();
+  return ok(undefined, expireRefreshCookie());
 });
 
 const meHandler = http.get("/api/me", ({ request }) => {
@@ -110,6 +141,7 @@ const wordHandler = http.get("/api/word", ({ request }) => {
 export const handlers = [
   signUpHandler,
   loginHandler,
+  refreshHandler,
   logoutHandler,
   meHandler,
   progressHandler,

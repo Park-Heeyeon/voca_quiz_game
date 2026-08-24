@@ -4,25 +4,22 @@ import { requestLogout } from "@/api";
 import { isLoggedInState } from "@/atom/isLoggedInState";
 import { userInfoState } from "@/atom/userInfoState";
 import { Button, Card, LevelBadge, ProgressBar } from "@/components";
+import { useAuthStore } from "@/shared/store/authStore";
 
 const UserHome: React.FC = () => {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useRecoilState(userInfoState);
   const setIsLoggedIn = useSetRecoilState(isLoggedInState);
+  const clearAccessToken = useAuthStore((state) => state.clearAccessToken);
 
   const { nickname, level = 1, levelRate = 0 } = userInfo;
 
   const logout = () => {
     requestLogout()
       .then(() => {
-        setUserInfo({
-          nickname: "",
-          id: "",
-          password: "",
-          level: 1,
-          levelRate: 0,
-        });
+        setUserInfo({ nickname: "", id: "", level: 1, levelRate: 0 });
         setIsLoggedIn(false);
+        clearAccessToken();
       })
       .catch(() => {});
   };

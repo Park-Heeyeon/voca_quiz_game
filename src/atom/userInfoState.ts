@@ -1,7 +1,7 @@
-import { UserInfoStateType } from "@/types";
+import { UserProfileType } from "@/types";
 import { atom } from "recoil";
 
-export const userInfoState = atom<UserInfoStateType>({
+export const userInfoState = atom<UserProfileType>({
   key: "userInfoState",
-  default: { nickname: "", id: "", password: "", level: 1, levelRate: 0 },
+  default: { nickname: "", id: "", level: 1, levelRate: 0 },
 });

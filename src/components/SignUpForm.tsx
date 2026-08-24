@@ -9,8 +9,7 @@ import { SignUpFormType } from "@/types";
 import { requestSignUp } from "@/api";
 import useModal from "@/utils/useModal";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState } from "recoil";
-import { userListState } from "@/atom/userListState";
+import { isAxiosError } from "axios";
 
 const SignUpForm: React.FC = () => {
   const form = useForm<z.infer<typeof SignUpSchema>>({
@@ -26,37 +25,11 @@ const SignUpForm: React.FC = () => {
   const navigate = useNavigate();
   const { openModal } = useModal();
   const { handleSubmit, control } = form;
-  const [userList, setUserList] = useRecoilState(userListState);
 
-  // 가입하기 버튼 클릭 시 실행되는 함수
+  // 중복 검사는 서버가 한다. 실패하면 서버가 내려준 메시지를 그대로 보여준다.
   const handleOnSubmit = (data: SignUpFormType) => {
-    const isDuplicateNickname = userList.some(
-      (user) => user.nickname === data.nickname
-    );
-    const isDuplicateId = userList.some((user) => user.id === data.id);
-
-    if (isDuplicateNickname) {
-      return openModal({
-        content: "중복된 닉네임이에요.",
-      });
-    }
-
-    if (isDuplicateId) {
-      return openModal({
-        content: "중복된 아이디에요.",
-      });
-    }
-
-    /* 
-        사용자가 입력한 정보가 모두 유효성 검사가 걸쳐지고 나면 
-        회원가입 요청 통신 (MSW) 후 통신이 성공이 된다면 Main으로 이동
-    */
     requestSignUp(data)
       .then(() => {
-        const { nickname, id, password } = data;
-        const userInfo = { nickname, id, password, level: 1, levelRate: 0 };
-        setUserList((prev) => [...prev, userInfo]); // 회원정보를 전역 상태로 저장
-
         openModal({
           content: "회원가입이 정상적으로 처리되었습니다.",
           clickEvent: () => {
@@ -64,10 +37,13 @@ const SignUpForm: React.FC = () => {
           },
         });
       })
-      .catch(() => {
+      .catch((error) => {
+        const message = isAxiosError(error)
+          ? error.response?.data?.message
+          : null;
         openModal({
           title: "에러",
-          content: `회원가입 요청 중 문제가 발생했습니다.`,
+          content: message ?? "회원가입 요청 중 문제가 발생했습니다.",
         });
       });
   };

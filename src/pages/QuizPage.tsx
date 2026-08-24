@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { AiOutlineLeft } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { getWordLevel } from "@/api";
+import { getWordLevel, requestProgress } from "@/api";
 import { userInfoState } from "@/atom/userInfoState";
-import { userListState } from "@/atom/userListState";
 import { Button, ProgressBar, WordCard } from "@/components";
 import AnswerModal from "@/components/modal/AnswerModal";
 import { VocaListType } from "@/types";
@@ -19,7 +18,6 @@ const QuizPage = () => {
   const [options, setOptions] = useState<string[]>([]);
   const [answer, setAnswer] = useState<string | null>(null);
   const [userInfo, setUserInfo] = useRecoilState(userInfoState);
-  const setUserList = useSetRecoilState(userListState);
   const level = userInfo.level || 1;
   const levelRate = userInfo.levelRate ?? 0;
 
@@ -66,24 +64,20 @@ const QuizPage = () => {
           },
         });
       } else {
-        setUserInfo((prev) => {
-          const currentLevel = prev.level ?? 1; // 기본값 1
-          const currentLevelRate = prev.levelRate ?? 0; // 기본값 0
-          const isLevelUp = currentLevelRate === 90;
-          return {
-            ...prev,
-            level: isLevelUp ? currentLevel + 1 : currentLevel,
-            levelRate: isLevelUp ? 0 : currentLevelRate + 10,
-          };
-        });
-        // 정답 알림 팝업 표출
-        openModal({
-          type: "custom",
-          content: <AnswerModal isAnswer={true} />,
-          clickEvent: () => {
-            getRandomQuiz();
-          },
-        });
+        requestProgress(true)
+          .then((response) => {
+            setUserInfo(response.data);
+            openModal({
+              type: "custom",
+              content: <AnswerModal isAnswer={true} />,
+              clickEvent: () => {
+                getRandomQuiz();
+              },
+            });
+          })
+          .catch(() => {
+            openModal({ content: "진행 상황을 저장하지 못했어요." });
+          });
       }
     } else {
       openModal({
@@ -98,15 +92,6 @@ const QuizPage = () => {
       getRandomQuiz();
     }
   }, [isFetched, data]); // data와 isFetched가 변경될 때마다 퀴즈 갱신
-
-  // userInfo 변경 시 userList 업데이트
-  useEffect(() => {
-    setUserList((prevList) => {
-      return prevList.map((user) =>
-        user.id === userInfo.id ? userInfo : user
-      );
-    });
-  }, [userInfo]);
 
   return (
     <div className="min-h-screen flex flex-col mx-auto w-full max-w-md px-4 pt-6 pb-10">
