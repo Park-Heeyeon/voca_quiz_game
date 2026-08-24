@@ -1,11 +1,9 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { useSetRecoilState } from "recoil";
+import { useQueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 import { requestLogin } from "@/api";
-import { isLoggedInState } from "@/atom/isLoggedInState";
-import { userInfoState } from "@/atom/userInfoState";
 import { useAuthStore } from "@/shared/store/authStore";
 import { LoginFormType } from "@/types";
 import useModal from "@/utils/useModal";
@@ -16,8 +14,7 @@ import { Form } from "../ui/form";
 const LoginModal: React.FC = () => {
   const { openModal, closeAllModal } = useModal();
   const navigate = useNavigate();
-  const setUserInfo = useSetRecoilState(userInfoState);
-  const setIsLoggedIn = useSetRecoilState(isLoggedInState);
+  const queryClient = useQueryClient();
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
 
   const form = useForm<LoginFormType>({
@@ -35,11 +32,9 @@ const LoginModal: React.FC = () => {
 
     // 자격 검증은 서버가 한다. 실패하면 서버가 내려준 메시지를 그대로 보여준다.
     requestLogin({ id, password })
-      .then((response) => {
-        const { user, accessToken } = response.data;
+      .then(({ user, accessToken }) => {
         setAccessToken(accessToken);
-        setUserInfo(user);
-        setIsLoggedIn(true);
+        queryClient.setQueryData(["me"], user);
         closeAllModal();
         navigate("/");
       })

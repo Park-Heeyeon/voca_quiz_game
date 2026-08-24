@@ -1,6 +1,5 @@
-import { useRecoilValue } from "recoil";
-import { userInfoState } from "@/atom/userInfoState";
 import useModal from "@/utils/useModal";
+import useUserInfo from "@/hooks/useUserInfo";
 import { Button, Confetti } from "@/components";
 
 interface AnswerModalProps {
@@ -9,10 +8,10 @@ interface AnswerModalProps {
 }
 
 const AnswerModal: React.FC<AnswerModalProps> = ({ isAnswer, clickEvent }) => {
-  const { level = 1, levelRate = 0 } = useRecoilValue(userInfoState);
+  const { data: userInfo } = useUserInfo();
   const { closeAllModal } = useModal();
 
-  const isLevelUp = levelRate === 0;
+  const isLevelUp = userInfo?.levelRate === 0;
 
   // 레벨업 팝업이 표시되지 않는 경우에만 clickEvent를 먼저 실행
   const onClickBtn = () => {
@@ -44,13 +43,13 @@ const AnswerModal: React.FC<AnswerModalProps> = ({ isAnswer, clickEvent }) => {
         <p className="mt-2 text-ink-soft">
           {isLevelUp ? (
             <>
-              <span className="font-bold text-brand">Level {level}</span> 로
+              <span className="font-bold text-brand">Level {userInfo?.level}</span> 로
               올라갔어요!
             </>
           ) : (
             <>
               다음 레벨까지{" "}
-              <span className="font-bold text-coral">{100 - levelRate}%</span>{" "}
+              <span className="font-bold text-coral">{100 - (userInfo?.levelRate ?? 0)}%</span>{" "}
               남았어요.
             </>
           )}

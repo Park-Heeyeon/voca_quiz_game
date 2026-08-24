@@ -5,17 +5,22 @@ import {
   RefreshResponseType,
   SignUpFormType,
   UserProfileType,
+  VocaListType
 } from "@/types";
 import { useAuthStore } from "@/shared/store/authStore";
-import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
+import axios, {
+  AxiosError,
+  AxiosRequestConfig,
+  InternalAxiosRequestConfig
+} from "axios";
 
 const BASE_URL = import.meta.env.VITE_REACT_API_URL;
 
 // withCredentials를 켜야 refreshToken 쿠키가 함께 전송된다.
 const api = axios.create({ baseURL: BASE_URL, withCredentials: true });
 
-// 재발급이 필요 없거나, 재발급을 시도하면 안 되는 경로
-const PUBLIC_PATHS = ["/login", "/signup", "/refresh"];
+// 이 경로의 401은 재발급으로 풀 수 없다
+const NO_RETRY_PATHS = ["/login", "/refresh"];
 
 api.interceptors.request.use((config) => {
   const { accessToken } = useAuthStore.getState();
@@ -53,7 +58,7 @@ api.interceptors.response.use(
       error.response?.status === 401 &&
       config &&
       !config.retried &&
-      !PUBLIC_PATHS.some((path) => config.url?.includes(path));
+      !NO_RETRY_PATHS.some((path) => config.url?.includes(path));
 
     if (!isRetryable) return Promise.reject(error);
 
@@ -71,54 +76,28 @@ api.interceptors.response.use(
   }
 );
 
-export const requestSignUp = async ({
-  nickname,
-  id,
-  password,
-}: SignUpFormType) => {
-  const response = await api.post<ApiResponseType<UserProfileType>>("/signup", {
-    nickname,
-    id,
-    password,
-  });
-  return response.data;
+const get = async <T>(url: string, config?: AxiosRequestConfig) => {
+  const { data } = await api.get<ApiResponseType<T>>(url, config);
+  return data.data;
 };
 
-export const requestLogin = async (loginForm: LoginFormType) => {
-  const response = await api.post<ApiResponseType<LoginResponseType>>(
-    "/login",
-    loginForm
-  );
-  return response.data;
+const post = async <T>(url: string, body?: unknown) => {
+  const { data } = await api.post<ApiResponseType<T>>(url, body);
+  return data.data;
 };
 
-export const requestLogout = async () => {
-  const response = await api.post("/logout");
-  return response.data;
-};
+export const requestSignUp = ({ nickname, id, password }: SignUpFormType) =>
+  post<UserProfileType>("/signup", { nickname, id, password });
 
-export const getUserInfo = async () => {
-  const response = await api.get<ApiResponseType<UserProfileType>>("/me");
-  return response.data;
-};
+export const requestLogin = (loginForm: LoginFormType) =>
+  post<LoginResponseType>("/login", loginForm);
 
-export const requestProgress = async (correct: boolean) => {
-  const response = await api.post<ApiResponseType<UserProfileType>>(
-    "/progress",
-    { correct }
-  );
-  return response.data;
-};
+export const requestLogout = () => post<void>("/logout");
 
-export const getWordLevel = async (level: number) => {
-  const response = await api.get("/word", { params: { level } });
-  return response.data;
-};
+export const getUserInfo = () => get<UserProfileType>("/me");
 
-// --- 임시 검증용 (제거 예정) ---
-declare global {
-  interface Window {
-    __api?: typeof api;
-  }
-}
-if (import.meta.env.DEV) window.__api = api;
+export const requestProgress = (correct: boolean) =>
+  post<UserProfileType>("/progress", { correct });
+
+export const getWordLevel = (level: number) =>
+  get<VocaListType[]>("/word", { params: { level } });

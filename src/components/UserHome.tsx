@@ -1,27 +1,26 @@
 import { useNavigate } from "react-router-dom";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useQueryClient } from "@tanstack/react-query";
 import { requestLogout } from "@/api";
-import { isLoggedInState } from "@/atom/isLoggedInState";
-import { userInfoState } from "@/atom/userInfoState";
 import { Button, Card, LevelBadge, ProgressBar } from "@/components";
+import useUserInfo from "@/hooks/useUserInfo";
 import { useAuthStore } from "@/shared/store/authStore";
 
 const UserHome: React.FC = () => {
   const navigate = useNavigate();
-  const [userInfo, setUserInfo] = useRecoilState(userInfoState);
-  const setIsLoggedIn = useSetRecoilState(isLoggedInState);
+  const queryClient = useQueryClient();
+  const { data: userInfo } = useUserInfo();
   const clearAccessToken = useAuthStore((state) => state.clearAccessToken);
 
-  const { nickname, level = 1, levelRate = 0 } = userInfo;
+  if (!userInfo) return null;
 
+  const { nickname, level, levelRate } = userInfo;
+
+  // 서버 요청이 실패해도 클라이언트는 로그아웃 상태가 되어야 한다.
   const logout = () => {
-    requestLogout()
-      .then(() => {
-        setUserInfo({ nickname: "", id: "", level: 1, levelRate: 0 });
-        setIsLoggedIn(false);
-        clearAccessToken();
-      })
-      .catch(() => {});
+    requestLogout().finally(() => {
+      clearAccessToken();
+      queryClient.removeQueries({ queryKey: ["me"] });
+    });
   };
 
   return (

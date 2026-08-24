@@ -1,16 +1,15 @@
 import { Route, Routes, Navigate } from "react-router-dom";
-import { useRecoilValue } from "recoil";
 import { HomePage, QuizPage, SignUpPage } from "./pages";
-import { isLoggedInState } from "./atom/isLoggedInState";
 import { Logo } from "@/components";
-import useSessionRestore from "@/utils/useSessionRestore";
+import useUserInfo from "@/hooks/useUserInfo";
+import { useAuthStore } from "@/shared/store/authStore";
 
 const App: React.FC = () => {
-  const isRestoring = useSessionRestore();
-  const isLoggedIn = useRecoilValue(isLoggedInState);
+  // 첫 조회가 끝나야 로그인 여부가 정해진다. 그 전에 라우팅하면 로그인 화면이 스쳐 지나간다.
+  const { isLoading } = useUserInfo();
+  const isLoggedIn = useAuthStore((state) => !!state.accessToken);
 
-  // 복원 결과가 나오기 전에 라우팅하면 로그인 화면이 잠깐 스쳐 지나간다.
-  if (isRestoring) {
+  if (isLoading) {
     return (
       <div className="min-h-screen grid place-items-center">
         <div className="animate-pulse">

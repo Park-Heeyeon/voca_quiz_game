@@ -1,9 +1,8 @@
-import { useRecoilValue } from "recoil";
-import { isLoggedInState } from "@/atom/isLoggedInState";
 import { UserHome, VisitorHome } from "@/components";
+import { useAuthStore } from "@/shared/store/authStore";
 
 const HomePage: React.FC = () => {
-  const isLoggedIn = useRecoilValue(isLoggedInState);
+  const isLoggedIn = useAuthStore((state) => !!state.accessToken);
 
   return (
     <div className="mx-auto w-full max-w-md px-4">
