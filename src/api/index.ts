@@ -5,17 +5,17 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_REACT_API_URL,
 });
 
-export const requestSignUp = async (userInfo: SignUpFormType) => {
-  const response = await api.post("/signup", {
-    params: { userInfo },
-  });
+export const requestSignUp = async ({
+  nickname,
+  id,
+  password,
+}: SignUpFormType) => {
+  const response = await api.post("/signup", { nickname, id, password });
   return response.data;
 };
 
 export const requestLogin = async (loginForm: LoginFormType) => {
-  const response = await api.post("/login", {
-    params: { loginForm },
-  });
+  const response = await api.post("/login", loginForm);
   return response.data;
 };
 
