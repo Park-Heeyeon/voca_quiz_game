@@ -1,10 +1,9 @@
-import { modalState } from "@/atom/modalState";
-import { useRecoilValue } from "recoil";
+import { useModalStore } from "@/shared/store/modalStore";
 import ModalLayout from "./ModalLayout";
 import useModal from "@/utils/useModal";
 
 const ModalProvider: React.FC = () => {
-  const modals = useRecoilValue(modalState);
+  const modals = useModalStore((state) => state.modals);
   const { closeModal } = useModal();
 
   return (

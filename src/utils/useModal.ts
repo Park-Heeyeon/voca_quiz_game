@@ -1,12 +1,20 @@
-import { modalState } from "@/atom/modalState";
+import { v4 as uuidv4 } from "uuid";
+import { useModalStore } from "@/shared/store/modalStore";
 import { ModalStateType } from "@/types";
-import { useRecoilState } from "recoil";
-import { v4 as uuidv4 } from "uuid"; // uuid 패키지에서 uuidv4를 임포트
 
-const isArrEmpty = (arr: unknown[]) => arr.length === 0;
+// 스크롤 잠금은 부수효과라 store가 아니라 훅에서 다룬다.
+const lockScroll = () => {
+  document.body.style.overflow = "hidden";
+};
+
+const unlockScroll = () => {
+  document.body.style.overflow = "unset";
+};
 
 const useModal = () => {
-  const [modals, setModals] = useRecoilState(modalState);
+  const addModal = useModalStore((state) => state.addModal);
+  const removeModal = useModalStore((state) => state.removeModal);
+  const clearModals = useModalStore((state) => state.clearModals);
 
   const openModal = ({
     type = "confirm",
@@ -14,25 +22,23 @@ const useModal = () => {
     content,
     clickEvent,
   }: ModalStateType) => {
-    const newModal = { id: uuidv4(), type, title, content, clickEvent };
-    // 모달이 열리면 스크롤 막기
-    document.body.style.overflow = "hidden";
-
-    setModals((prev) => [...prev, newModal]);
+    lockScroll();
+    addModal({ id: uuidv4(), type, title, content, clickEvent });
   };
 
   const closeModal = (id?: string) => {
     if (!id) return;
-    setModals((prev) => prev.filter((item) => item.id !== id));
-    // 모달이 모두 닫힌 경우 스크롤이 가능하도록 변경
-    if (isArrEmpty(modals)) document.body.style.overflow = "unset";
+
+    removeModal(id);
+    if (useModalStore.getState().modals.length === 0) unlockScroll();
   };
 
   const closeAllModal = () => {
-    setModals([]);
-    document.body.style.overflow = "unset";
+    clearModals();
+    unlockScroll();
   };
 
   return { openModal, closeModal, closeAllModal };
 };
+
 export default useModal;
