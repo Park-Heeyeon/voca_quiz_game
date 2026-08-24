@@ -11,7 +11,7 @@ import {
   issueSession,
   REFRESH_TOKEN_TTL,
   rotateAccessToken,
-  toProfile,
+  toProfile
 } from "./db";
 
 const REFRESH_COOKIE = "refreshToken";
@@ -28,11 +28,11 @@ const unauthorized = () => fail("UNAUTHORIZED", "인증이 필요합니다.", 40
 const setRefreshCookie = (token: string) => ({
   "Set-Cookie": `${REFRESH_COOKIE}=${token}; HttpOnly; Path=/; SameSite=Lax; Max-Age=${
     REFRESH_TOKEN_TTL / 1000
-  }`,
+  }`
 });
 
 const expireRefreshCookie = () => ({
-  "Set-Cookie": `${REFRESH_COOKIE}=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0`,
+  "Set-Cookie": `${REFRESH_COOKIE}=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0`
 });
 
 const authUser = (request: Request) => {
@@ -123,10 +123,12 @@ const progressHandler = http.post("/api/progress", async ({ request }) => {
   return ok(toProfile(user));
 });
 
+const { oneLevel, twoLevel, threeLevel } = mockData;
+
 const WORDS_BY_LEVEL = {
-  1: mockData.oneLevelWords,
-  2: mockData.twoLevelWords,
-  3: mockData.threeLevelWords,
+  1: oneLevel,
+  2: twoLevel,
+  3: threeLevel
 } as const;
 
 const wordHandler = http.get("/api/word", ({ request }) => {
@@ -145,5 +147,5 @@ export const handlers = [
   logoutHandler,
   meHandler,
   progressHandler,
-  wordHandler,
+  wordHandler
 ];
