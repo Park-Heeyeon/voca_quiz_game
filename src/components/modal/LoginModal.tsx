@@ -79,33 +79,36 @@ const LoginModal: React.FC = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleOnSubmit)}
-        className="relative p-1 pb-0 space-y-3 overflow-x-hidden"
+        className="relative space-y-4 overflow-x-hidden"
       >
         {/** 아이디 */}
         <InputField<LoginFormType>
           control={form.control}
           name="id"
-          placeholder="ID"
+          label="아이디"
+          placeholder="아이디를 입력해주세요"
         />
         {/** 비밀번호 */}
         <InputField<LoginFormType>
           control={form.control}
           type="password"
           name="password"
-          placeholder="PASSWORD"
+          label="비밀번호"
+          placeholder="비밀번호를 입력해주세요"
         />
-        <div className="btn-box space-y-2 h-full">
-          <Button
-            type="submit"
-            text="Submit"
-            style="bg-customDepBlueColor hover:bg-customBlueColor w-full h-auto py-2"
-          />
-          <Button
-            text="Sign Up"
-            style="bg-customGrayColor w-full h-auto py-2"
-            clickEvent={onClickSignUp}
-          />
-        </div>
+        <Button type="submit" size="lg" className="w-full !mt-6">
+          로그인
+        </Button>
+        <p className="text-center text-sm text-ink-soft">
+          아직 계정이 없나요?{" "}
+          <button
+            type="button"
+            onClick={onClickSignUp}
+            className="font-semibold text-brand hover:underline"
+          >
+            회원가입
+          </button>
+        </p>
       </form>
     </Form>
   );

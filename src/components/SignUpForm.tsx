@@ -76,7 +76,7 @@ const SignUpForm: React.FC = () => {
     <Form {...form}>
       <form
         onSubmit={handleSubmit(handleOnSubmit)}
-        className="relative p-1 pb-0 space-y-3 overflow-x-hidden"
+        className="relative space-y-4 overflow-x-hidden"
       >
         {/** 닉네임  */}
         <InputField<SignUpFormType>
@@ -107,9 +107,9 @@ const SignUpForm: React.FC = () => {
           label="비밀번호 확인"
           placeholder="비밀번호를 한 번 더 입력해주세요"
         />
-        <div className="btn-box">
-          <Button type="submit" text="가입하기" style="px-10 py-4 mt-8" />
-        </div>
+        <Button type="submit" size="lg" className="w-full !mt-7">
+          가입하기
+        </Button>
       </form>
     </Form>
   );

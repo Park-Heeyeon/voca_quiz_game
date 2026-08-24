@@ -1,15 +1,18 @@
-import { getWordLevel } from "@/api";
-import { userInfoState } from "@/atom/userInfoState";
-import { userListState } from "@/atom/userListState";
-import { Button } from "@/components";
-import AnswerModal from "@/components/modal/AnswerModal";
-import { VocaListType } from "@/types";
-import useModal from "@/utils/useModal";
-import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { AiOutlineLeft } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState, useSetRecoilState } from "recoil";
+import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import { getWordLevel } from "@/api";
+import { userInfoState } from "@/atom/userInfoState";
+import { userListState } from "@/atom/userListState";
+import { Button, ProgressBar, WordCard } from "@/components";
+import AnswerModal from "@/components/modal/AnswerModal";
+import { VocaListType } from "@/types";
+import useModal from "@/utils/useModal";
+
+const OPTION_LABELS = ["A", "B", "C"];
 
 const QuizPage = () => {
   const [randomWord, setRandomWord] = useState<string | null>(null);
@@ -18,6 +21,7 @@ const QuizPage = () => {
   const [userInfo, setUserInfo] = useRecoilState(userInfoState);
   const setUserList = useSetRecoilState(userListState);
   const level = userInfo.level || 1;
+  const levelRate = userInfo.levelRate ?? 0;
 
   const { openModal } = useModal();
   const navigate = useNavigate();
@@ -105,28 +109,50 @@ const QuizPage = () => {
   }, [userInfo]);
 
   return (
-    <div className="mx-auto w-full max-w-xs sm:max-w-sm md:max-w-md">
-      <AiOutlineLeft
-        className="absolute top-2 cursor-pointer text-customGrayColor left-2 w-6 h-6"
-        onClick={() => navigate("/")}
-      />{" "}
-      <div className="flex flex-col items-center justify-center h-screen p-4">
+    <div className="min-h-screen flex flex-col mx-auto w-full max-w-md px-4 pt-6 pb-10">
+      <div className="flex items-center gap-3">
+        <button
+          aria-label="홈으로"
+          onClick={() => navigate("/")}
+          className="grid place-items-center w-10 h-10 rounded-full bg-white border border-line text-ink-soft hover:text-ink transition"
+        >
+          <AiOutlineLeft className="w-5 h-5" />
+        </button>
+        <div className="flex-1">
+          <ProgressBar value={levelRate} />
+        </div>
+        <span className="font-display font-semibold text-sm text-brand whitespace-nowrap">
+          Lv.{level}
+        </span>
+      </div>
+
+      <div className="flex-1 flex flex-col justify-center gap-7">
         {randomWord && (
-          <div className="bg-white shadow-lg rounded-lg p-6 mb-4 w-full max-w-md text-center">
-            <h1 className="text-3xl font-bold mb-10">{randomWord}</h1>
-            <div className="flex flex-col space-y-3">
+          <motion.div
+            key={randomWord}
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
+            className="flex flex-col gap-7"
+          >
+            <WordCard word={randomWord} tag="이 단어의 뜻은?" />
+            <div className="flex flex-col gap-3">
               {options.map((option, index) => (
                 <Button
-                  key={index}
-                  text={option}
-                  style="w-[60%] py-2 text-lg text-white font-semibold rounded-2lg shadow hover:bg-customDepBlueColor transition duration-200"
-                  clickEvent={() => {
-                    onClickOption(option);
-                  }}
-                />
+                  key={option}
+                  variant="secondary"
+                  size="lg"
+                  className="w-full justify-start gap-3 font-semibold"
+                  onClick={() => onClickOption(option)}
+                >
+                  <span className="grid place-items-center w-7 h-7 rounded-lg bg-brand-soft text-brand text-sm font-bold">
+                    {OPTION_LABELS[index]}
+                  </span>
+                  {option}
+                </Button>
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
     </div>

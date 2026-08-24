@@ -1,16 +1,16 @@
-import { userInfoState } from "@/atom/userInfoState";
-import MainImg from "@public/images/main_img.png";
+import { useNavigate } from "react-router-dom";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import Button from "./common/Button";
 import { requestLogout } from "@/api";
 import { isLoggedInState } from "@/atom/isLoggedInState";
-import { useNavigate } from "react-router-dom";
+import { userInfoState } from "@/atom/userInfoState";
+import { Button, Card, LevelBadge, ProgressBar } from "@/components";
 
 const UserHome: React.FC = () => {
+  const navigate = useNavigate();
   const [userInfo, setUserInfo] = useRecoilState(userInfoState);
   const setIsLoggedIn = useSetRecoilState(isLoggedInState);
 
-  const navigate = useNavigate();
+  const { nickname, level = 1, levelRate = 0 } = userInfo;
 
   const logout = () => {
     requestLogout()
@@ -28,49 +28,43 @@ const UserHome: React.FC = () => {
   };
 
   return (
-    <>
-      <div className="img-container flex justify-center mt-40 md:mt-32">
-        <img
-          src={MainImg}
-          alt="Profile Logo"
-          className="w-full h-auto max-h-80"
-        />
-      </div>
-      <div className="text-center mt-8 px-4">
-        <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">
-          {userInfo.nickname} 님의
-          <br />
-          현재 레벨은
-          <span className="font-bold text-customDepBlueColor">
-            {" "}
-            {userInfo.level} Level{" "}
-          </span>
-          이에요!
-        </h3>
-        <p className="text-base md:text-xl text-gray-600">
-          다음 레벨까지
-          <span className="font-semibold text-customDepBlueColor">
-            {" "}
-            {100 - (userInfo.levelRate ?? 0)}%{" "}
-          </span>
-          남았어요.
-          <br />
-          다음 레벨을 향해 퀴즈를 풀러 가볼까요?
-        </p>
-        <div className="flex mt-4 justify-center">
-          <Button
-            style="mx-1 px-6 py-3 text-white rounded-md"
-            text="퀴즈 풀기"
-            clickEvent={() => navigate("/quiz")}
-          />
-          <Button
-            style="mx-1 px-6 py-3 bg-customGrayColor text-white rounded-md"
-            text="오늘은 그만"
-            clickEvent={logout}
-          />
+    <div className="flex flex-col pt-14 pb-10 px-2">
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-ink-soft text-sm">반가워요</p>
+          <h1 className="font-display font-bold text-2xl text-ink">
+            {nickname} 님 👋
+          </h1>
         </div>
+        <LevelBadge level={level} />
       </div>
-    </>
+
+      <Card className="mt-6">
+        <div className="flex items-baseline justify-between mb-2">
+          <span className="font-semibold text-ink">레벨 진행률</span>
+          <span className="font-display font-bold text-2xl text-brand">
+            {levelRate}
+            <span className="text-base text-ink-soft">%</span>
+          </span>
+        </div>
+        <ProgressBar value={levelRate} />
+        <p className="mt-3 text-sm text-ink-soft">
+          다음 레벨까지{" "}
+          <span className="font-bold text-coral">{100 - levelRate}%</span>{" "}
+          남았어요.
+        </p>
+      </Card>
+
+      <div className="mt-8 flex flex-col gap-3">
+        <Button size="lg" className="w-full" onClick={() => navigate("/quiz")}>
+          퀴즈 시작하기
+        </Button>
+        <Button variant="ghost" className="w-full" onClick={logout}>
+          오늘은 그만할래요
+        </Button>
+      </div>
+    </div>
   );
 };
+
 export default UserHome;

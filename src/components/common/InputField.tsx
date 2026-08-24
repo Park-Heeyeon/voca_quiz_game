@@ -6,7 +6,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../ui/form";
+} from "@/components/ui/form";
 import { Control, FieldValues, Path } from "react-hook-form";
 
 type FieldProps<T extends FieldValues> = {
@@ -33,8 +33,10 @@ const InputField = <T extends FieldValues>({
       control={control} // control 속성을 직접 전달
       name={name}
       render={({ field }) => (
-        <FormItem className="h-full">
-          <FormLabel className="text-customDepBlueColor">{label}</FormLabel>
+        <FormItem className="h-full text-left">
+          <FormLabel className="text-ink font-semibold text-sm">
+            {label}
+          </FormLabel>
           <FormControl>
             <Input
               placeholder={placeholder}
