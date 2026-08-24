@@ -1,5 +1,5 @@
 {
-  "oneLevelWords": [
+  "oneLevel": [
     { "word": "apple", "meaning": "사과" },
     { "word": "ball", "meaning": "공" },
     { "word": "cat", "meaning": "고양이" },
@@ -53,7 +53,7 @@
     { "word": "run", "meaning": "달리다" },
     { "word": "jump", "meaning": "뛰다" }
   ],
-  "twoLevelWords": [
+  "twoLevel": [
     { "word": "analyze", "meaning": "분석하다" },
     { "word": "concept", "meaning": "개념" },
     { "word": "define", "meaning": "정의하다" },
@@ -105,7 +105,7 @@
     { "word": "differentiate", "meaning": "구별하다" },
     { "word": "hypothesize", "meaning": "가설을 세우다" }
   ],
-  "threeLevelWords": [
+  "threeLevel": [
     { "word": "ambivalent", "meaning": "상반된 감정을 가진" },
     { "word": "benevolent", "meaning": "자비로운" },
     { "word": "cacophony", "meaning": "불협화음" },
